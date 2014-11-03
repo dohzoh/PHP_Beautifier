@@ -103,9 +103,11 @@ abstract class PHP_Beautifier_Filter
     public function __construct(PHP_Beautifier $oBeaut, $aSettings = array())
     {
         $this->oBeaut = $oBeaut;
-        if ($aSettings) {
-            $this->aSettings = $aSettings;
-        }
+        if (is_array($aSettings) && ! empty($aSettings) )
+            foreach( $aSettings as $key => $value){
+//Log::singleton("console")->debug('start '.__METHOD__."$key => $value");
+                $this->setSetting($key, $value);
+            }
     }
     /**
      * Add a setting definition
