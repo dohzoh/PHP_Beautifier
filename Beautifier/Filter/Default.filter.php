@@ -77,4 +77,22 @@ final class PHP_Beautifier_Filter_Default extends PHP_Beautifier_Filter
     public function off() 
     {
     }
+    /**
+     * t_whitespace
+     *
+     * @param mixed $sTag The tag to be processed
+     *
+     * @access public
+     * @return void
+     */
+    function t_whitespace($sTag)
+    {
+/*
+        $before = strstr($sTag, " ", true);
+        $after = strstr($sTag, " ");
+        $sTag = $before.substr_replace($after,"",0,1);
+*/
+//Log::singleton('console')->info(__METHOD__."(".bin2hex($sTag)."):".$sTag);
+        $this->oBeaut->add($sTag);
+    }
 }
