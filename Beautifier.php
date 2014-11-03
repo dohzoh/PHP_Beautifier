@@ -20,7 +20,7 @@
  * @link      http://pear.php.net/package/PHP_Beautifier
  * @link      http://beautifyphp.sourceforge.net
  */
-error_reporting(E_ALL);
+error_reporting (E_ALL & ~(E_DEPRECATED | E_STRICT));
 // Before all, test the tokenizer extension
 if (!extension_loaded('tokenizer')) {
     throw new Exception("Compile php with tokenizer extension. Use --enable-tokenizer or don't use --disable-all on configure.");
