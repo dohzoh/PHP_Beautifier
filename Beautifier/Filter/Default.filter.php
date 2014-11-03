@@ -78,6 +78,31 @@ final class PHP_Beautifier_Filter_Default extends PHP_Beautifier_Filter
     {
     }
     /**
+     * replace white space
+     */
+    private function _whitespace_replace($sTag)
+    {
+        $indentChar = $this->oBeaut->getIndentChar();
+        $indentNumber = $this->oBeaut->getIndentNumber();
+        if($indentChar!=="\t"){  // space indent
+            $regexChar = "\t";
+            $regexNumber = "1";
+        }
+        else{   // tab indent
+            $regexChar = " ";
+            $regexNumber = "4";
+        }
+
+        $regex = <<<REGEX
+![{$regexChar}]{{$regexNumber}}!i
+REGEX;
+        $replace = str_repeat($indentChar, $indentNumber);
+        $sTag = preg_replace($regex, $replace, $sTag);
+
+        return $sTag;
+    }
+
+    /**
      * t_whitespace
      *
      * @param mixed $sTag The tag to be processed
@@ -93,6 +118,19 @@ final class PHP_Beautifier_Filter_Default extends PHP_Beautifier_Filter
         $sTag = $before.substr_replace($after,"",0,1);
 */
 //Log::singleton('console')->info(__METHOD__."(".bin2hex($sTag)."):".$sTag);
-        $this->oBeaut->add($sTag);
+        $this->oBeaut->add( $this->_whitespace_replace($sTag));
     }
+    /**
+     * t_comment
+     *
+     * @param mixed $sTag The tag to be processed
+     *
+     * @access public
+     * @return void
+     */
+    function t_comment($sTag)
+    {
+        $this->oBeaut->add( $this->_whitespace_replace($sTag));
+    }
+
 }

@@ -46,7 +46,7 @@
  * @link       http://pear.php.net/package/PHP_Beautifier
  * @link       http://beautifyphp.sourceforge.net
  */
-final class PHP_Beautifier_Filter_Default extends PHP_Beautifier_Filter
+final class PHP_Beautifier_Filter_Beautifier extends PHP_Beautifier_Filter
 {
     protected $aSettings = array();
     protected $sDescription = 'Default Filter for PHP_Beautifier';
@@ -322,7 +322,7 @@ final class PHP_Beautifier_Filter_Default extends PHP_Beautifier_Filter
     }
     /**
      * t_doc_comment 
-     * 
+     *
      * @param mixed $sTag The tag to be processed
      *
      * @access public
