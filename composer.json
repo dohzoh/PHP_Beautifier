@@ -24,8 +24,7 @@
     "require": {
         "php": ">=5",
         "pear-pear.php.net/PEAR": "*@stable",
-        "pear-pear.php.net/Log": "*@stable",
-        "psr/log": "*@stable"
+        "pear-pear.php.net/Log": "*@stable"
     },
     "require-dev": {
         "phpunit/phpunit": "3.7.*@stable",
