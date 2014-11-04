@@ -48,7 +48,8 @@
  */
 final class PHP_Beautifier_Filter_Default extends PHP_Beautifier_Filter
 {
-    protected $aSettings = array();
+	const FILTER_INDENTATION = "indentation";
+    protected $aSettings = array(self::FILTER_INDENTATION => "true");
     protected $sDescription = 'Default Filter for PHP_Beautifier';
     /**
      * __call 
@@ -102,6 +103,14 @@ REGEX;
         return $sTag;
     }
 
+	public function filterIndentation($sTag)
+	{
+		if($this->getSetting(self::FILTER_INDENTATION)==="true")
+	        $this->oBeaut->add( $this->_whitespace_replace($sTag));
+		else
+	        $this->oBeaut->add($sTag);
+	}
+	
     /**
      * t_whitespace
      *
@@ -118,7 +127,7 @@ REGEX;
         $sTag = $before.substr_replace($after,"",0,1);
 */
 //Log::singleton('console')->info(__METHOD__."(".bin2hex($sTag)."):".$sTag);
-        $this->oBeaut->add( $this->_whitespace_replace($sTag));
+		$this->filterIndentation($sTag);
     }
     /**
      * t_comment
@@ -130,7 +139,19 @@ REGEX;
      */
     function t_comment($sTag)
     {
-        $this->oBeaut->add( $this->_whitespace_replace($sTag));
+		$this->filterIndentation($sTag);
     }
+    /**
+     * t_doc_comment 
+     *
+     * @param mixed $sTag The tag to be processed
+     *
+     * @access public
+     * @return void
+     */
+    function t_doc_comment($sTag) 
+    {
+		$this->filterIndentation($sTag);
+	}
 
 }

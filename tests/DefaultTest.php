@@ -21,6 +21,10 @@ class DefaultTest extends PHPUnit_Framework_TestCase {
         $sTextOriginal = <<<SCRIPT
 <?php
 class indent{
+	/**
+	 * large comment
+	 * @author Yohzoh Matsui <dzworks@outlook.jp>
+	 */
 	public function __construct(){
 		abc
 	}
@@ -30,6 +34,10 @@ SCRIPT;
         $sTextExpected = <<<SCRIPT
 <?php
 class indent{
+    /**
+     * large comment
+     * @author Yohzoh Matsui <dzworks@outlook.jp>
+     */
     public function __construct(){
         abc
     }
@@ -50,6 +58,10 @@ SCRIPT;
         $sTextOriginal = <<<SCRIPT
 <?php
 class indent{
+    /**
+     * large comment
+     * @author Yohzoh Matsui <dzworks@outlook.jp>
+     */
     public function __construct(){
         abc
     }
@@ -59,6 +71,10 @@ SCRIPT;
         $sTextExpected = <<<SCRIPT
 <?php
 class indent{
+	/**
+	 * large comment
+	 * @author Yohzoh Matsui <dzworks@outlook.jp>
+	 */
 	public function __construct(){
 		abc
 	}

@@ -229,6 +229,7 @@ abstract class PHP_Beautifier_Filter
             $sMethod = $this->oBeaut->getTokenFunction($token[0]);
         }
         $sValue = $token[1];
+//Log::singleton('console')->info($sMethod."(".bin2hex($sValue)."):".$sValue);
         if ($sMethod) {
             PHP_Beautifier_Common::getLog()->log($this->getName()."->".$sMethod."(".trim($sValue).")", PEAR_LOG_DEBUG);
             // return false if PHP_Beautifier_Filter::BYPASS

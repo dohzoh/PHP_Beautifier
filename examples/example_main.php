@@ -31,6 +31,10 @@
     {
     }
     class class_1 extends class_0 {
+        protected $data                 = array();
+        protected $host_data            = array();
+        protected $main_data            = array();
+        protected $bonus_data           = array();		
     }
     // Third, do you remember Pascal?
     if ($a):
