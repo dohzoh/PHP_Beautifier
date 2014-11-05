@@ -325,5 +325,20 @@ abstract class PHP_Beautifier_Filter
         // php_beautifier->setBeautify(true);
         return $sOut;
     }
+	
+	/**
+	 * check including linefeed code (CRLF,CR,LF)
+	 * @param string $sTag
+	 * @return boolean
+	 */
+	protected function haveLinefeed($sTag){
+		$regex = <<<REGEX
+!([\r\n]{1})!
+REGEX;
+		if(preg_match($regex, $sTag))
+			return true;
+		else
+	        return false;
+	}
 }
-?>
+

@@ -65,7 +65,7 @@ final class PHP_Beautifier_Filter_Default extends PHP_Beautifier_Filter
         if (!is_array($aArgs) or count($aArgs) != 1) {
             throw (new Exception('Call to Filter::__call with wrong argument'));
         }
-        PHP_Beautifier_Common::getLog()->log('Default Filter:unhandled[' . $aArgs[0] . ']', PEAR_LOG_DEBUG);
+//Log::singleton('console')->info(__METHOD__."(".bin2hex($aArgs[0])."):".print_r($aArgs,true));
         $this->oBeaut->add($aArgs[0]);
     }
     // Bypass the function!
@@ -119,6 +119,7 @@ REGEX;
      * @access public
      * @return void
      */
+	private $_IndentNextWhitespace = false;
     function t_whitespace($sTag)
     {
 /*
@@ -127,7 +128,14 @@ REGEX;
         $sTag = $before.substr_replace($after,"",0,1);
 */
 //Log::singleton('console')->info(__METHOD__."(".bin2hex($sTag)."):".$sTag);
-		$this->filterIndentation($sTag);
+		if( $this->haveLinefeed($sTag) )
+			$this->filterIndentation($sTag);
+		elseif( $this->_IndentNextWhitespace ){
+			$this->_IndentNextWhitespace = false;
+			$this->filterIndentation($sTag);
+		}
+		else
+	        $this->oBeaut->add($sTag);
     }
     /**
      * t_comment
@@ -139,7 +147,12 @@ REGEX;
      */
     function t_comment($sTag)
     {
-		$this->filterIndentation($sTag);
+		if( $this->haveLinefeed($sTag) ){
+			$this->_IndentNextWhitespace = true;
+	        $this->oBeaut->add($sTag);
+		}
+		else
+			$this->filterIndentation($sTag);
     }
     /**
      * t_doc_comment 
@@ -154,4 +167,16 @@ REGEX;
 		$this->filterIndentation($sTag);
 	}
 
+    /**
+     * t_open_tag 
+     * 
+     * @param mixed $sTag The tag to be processed
+     *
+     * @access public
+     * @return void
+     */
+	function t_open_tag($sTag){
+		$this->_IndentNextWhitespace = true;
+		$this->oBeaut->add($sTag);
+	}
 }
