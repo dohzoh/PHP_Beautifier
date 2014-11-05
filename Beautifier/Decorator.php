@@ -45,6 +45,7 @@ abstract class PHP_Beautifier_Decorator implements PHP_Beautifier_Interface
     function __construct(PHP_Beautifier_Interface $oBeaut) 
     {
         $this->oBeaut = $oBeaut;
+		$this->oBeaut->isBatch = true;
     }
 
     /**
@@ -71,4 +72,3 @@ abstract class PHP_Beautifier_Decorator implements PHP_Beautifier_Interface
         }
     }
 }
-?>

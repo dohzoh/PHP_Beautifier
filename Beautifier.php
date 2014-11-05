@@ -20,7 +20,7 @@
  * @link      http://pear.php.net/package/PHP_Beautifier
  * @link      http://beautifyphp.sourceforge.net
  */
-error_reporting(E_ALL);
+error_reporting (E_ALL & ~(E_DEPRECATED | E_STRICT));
 // Before all, test the tokenizer extension
 if (!extension_loaded('tokenizer')) {
     throw new Exception("Compile php with tokenizer extension. Use --enable-tokenizer or don't use --disable-all on configure.");
@@ -170,7 +170,7 @@ class PHP_Beautifier implements PHP_Beautifier_Interface
      * Type of newline
      * @var string
      */
-    public $sNewLine = PHP_EOL;
+    public $sNewLine = "\n";
     /**
      * Type of whitespace to use for indent
      * @var string
@@ -242,7 +242,7 @@ class PHP_Beautifier implements PHP_Beautifier_Interface
     /** Mark the begin of the end of a DoWhile sequence **/
     private $doWhileBeginEnd;
     // Methods
-    
+    public $isBatch = false;
     /**
      * Constructor.
      * Assing values to {@link $aControlStructures},{@link $aControlStructuresEnd},
@@ -390,7 +390,6 @@ class PHP_Beautifier implements PHP_Beautifier_Interface
             $this->aTokenFunctions[$iToken] = $sFunction;
         }
         $this->addFilterDirectory(dirname(__FILE__) . '/Beautifier/Filter');
-        $this->addFilter('Default');
         $this->oLog = PHP_Beautifier_Common::getLog();
     }
 
@@ -462,9 +461,19 @@ class PHP_Beautifier implements PHP_Beautifier_Interface
      * @access public
      * @return void
      */
+    private $_setDefaultFileter = false;
     public function addFilterObject(PHP_Beautifier_Filter $oFilter) 
     {
-        array_unshift($this->aFilters, $oFilter);
+//Log::singleton("console")->debug("start ".__METHOD__."(".get_class($oFilter).")");
+        $class = get_class($oFilter);
+        if($class !== 'PHP_Beautifier_Filter_Default')
+            $this->aFilters[get_class($oFilter)] = $oFilter;
+        else {
+            if(! $this->_setDefaultFileter){
+                $this->_setDefaultFileter = true;
+                array_push($this->aFilters, $oFilter);
+            }
+        }
         return true;
     }
 
@@ -857,6 +866,8 @@ class PHP_Beautifier implements PHP_Beautifier_Interface
         $iTotal = count($this->aTokens);
         $iPrevAssoc = false;
         // Send a signal to the filter, announcing the init of the processing of a file
+        if(! $this->_setDefaultFileter)
+            $this->addFilter('Default');
         foreach ($this->aFilters as $oFilter) {
             $oFilter->preProcess();
         }

@@ -103,9 +103,11 @@ abstract class PHP_Beautifier_Filter
     public function __construct(PHP_Beautifier $oBeaut, $aSettings = array())
     {
         $this->oBeaut = $oBeaut;
-        if ($aSettings) {
-            $this->aSettings = $aSettings;
-        }
+        if (is_array($aSettings) && ! empty($aSettings) )
+            foreach( $aSettings as $key => $value){
+//Log::singleton("console")->debug('start '.__METHOD__."$key => $value");
+                $this->setSetting($key, $value);
+            }
     }
     /**
      * Add a setting definition
@@ -227,6 +229,7 @@ abstract class PHP_Beautifier_Filter
             $sMethod = $this->oBeaut->getTokenFunction($token[0]);
         }
         $sValue = $token[1];
+//Log::singleton('console')->info($sMethod."(".bin2hex($sValue)."):".$sValue);
         if ($sMethod) {
             PHP_Beautifier_Common::getLog()->log($this->getName()."->".$sMethod."(".trim($sValue).")", PEAR_LOG_DEBUG);
             // return false if PHP_Beautifier_Filter::BYPASS
@@ -322,5 +325,20 @@ abstract class PHP_Beautifier_Filter
         // php_beautifier->setBeautify(true);
         return $sOut;
     }
+	
+	/**
+	 * check including linefeed code (CRLF,CR,LF)
+	 * @param string $sTag
+	 * @return boolean
+	 */
+	protected function haveLinefeed($sTag){
+		$regex = <<<REGEX
+!([\r\n]{1})!
+REGEX;
+		if(preg_match($regex, $sTag))
+			return true;
+		else
+	        return false;
+	}
 }
-?>
+
