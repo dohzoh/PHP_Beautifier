@@ -49,8 +49,65 @@
 final class PHP_Beautifier_Filter_Default extends PHP_Beautifier_Filter
 {
 	const FILTER_INDENTATION = "indentation";
-    protected $aSettings = array(self::FILTER_INDENTATION => "true");
+	const FILTER_LINEFEED = "linefeed";
+	
+	// default settings
+    protected $aSettings = array(
+		self::FILTER_INDENTATION => "true",
+		self::FILTER_LINEFEED    => "LF", // LF, CR, CRLF, PHPEOL, false
+	);
+
     protected $sDescription = 'Default Filter for PHP_Beautifier';
+    /**
+     * Constructor
+     * If you need to overload this (for example, to create a
+     * definition for setting with {@link addSettingDefinition()}
+     * remember call the parent constructor.
+     * <code>
+     * parent::__construct($oBeaut, $aSettings)
+     * </code>
+     * 
+     * @param PHP_Beautifier $oBeaut    PHP_Beautifier Object
+     * @param array          $aSettings Settings for the PHP_Beautifier
+     *
+     * @access public
+     * @return void
+     */
+    public function __construct(PHP_Beautifier $oBeaut, $aSettings = array())
+    {
+		parent::__construct($oBeaut, $aSettings);
+		$this->_init();
+    }
+	private function _init(){
+		$this->_initLineFeed();	// linefeed setting
+	}
+	/**
+	 * initialize of line feed setting
+	 */
+	private function _initLineFeed(){
+		// line feed setting
+		if($this->oBeaut->isBatch){
+			$linefeed = $this->getSetting(self::FILTER_LINEFEED);
+
+			$replace = "\n";
+			switch($linefeed){
+				case "CRLF":
+					$replace = "\r\n";
+					break;
+				case "CR":
+					$replace = "\r";
+					break;
+				case "PHPEOL":
+					$replace = PHP_EOL;
+					break;
+				case "LF":
+				default:
+					break;
+			}
+			$this->oBeaut->setNewLine($replace);
+		}
+	}
+	
     /**
      * __call 
      * 
@@ -66,7 +123,7 @@ final class PHP_Beautifier_Filter_Default extends PHP_Beautifier_Filter
             throw (new Exception('Call to Filter::__call with wrong argument'));
         }
 //Log::singleton('console')->info(__METHOD__."(".bin2hex($aArgs[0])."):".print_r($aArgs,true));
-        $this->oBeaut->add($aArgs[0]);
+        $this->add($aArgs[0]);
     }
     // Bypass the function!
     /**
@@ -78,10 +135,27 @@ final class PHP_Beautifier_Filter_Default extends PHP_Beautifier_Filter
     public function off() 
     {
     }
-    /**
-     * replace white space
-     */
-    private function _whitespace_replace($sTag)
+	
+	/**
+	 * PHP_Beautify::add
+	 * @param string $sTag
+	 */
+	public function add($sTag){
+		$this->oBeaut->add( $this->filterLinefeed($sTag));
+	}
+
+	/**
+	 * indentation filter
+	 * @param type $sTag
+	 */
+	public function filterIndentation($sTag)
+	{
+		if($this->getSetting(self::FILTER_INDENTATION)==="true")
+	        $this->add( $this->_filterIndentation($sTag));
+		else
+	        $this->add($sTag);
+	}
+    private function _filterIndentation($sTag)
     {
         $indentChar = $this->oBeaut->getIndentChar();
         $indentNumber = $this->oBeaut->getIndentNumber();
@@ -102,13 +176,18 @@ REGEX;
 
         return $sTag;
     }
-
-	public function filterIndentation($sTag)
-	{
-		if($this->getSetting(self::FILTER_INDENTATION)==="true")
-	        $this->oBeaut->add( $this->_whitespace_replace($sTag));
-		else
-	        $this->oBeaut->add($sTag);
+	
+	/**
+	 * linefeed filter
+	 * @param type $sTag
+	 */
+	public function filterLinefeed($sTag){
+		if(($linefeed = $this->getSetting(self::FILTER_LINEFEED))!=="false"){
+			$replace = $this->oBeaut->getNewLine();
+			$sTag = strtr($sTag, array_fill_keys(array("\r\n", "\r", "\n"), $replace));
+//			$sTag = preg_replace($regex, $replace,$sTag);
+		}
+		return $sTag;
 	}
 	
     /**
@@ -135,7 +214,7 @@ REGEX;
 			$this->filterIndentation($sTag);
 		}
 		else
-	        $this->oBeaut->add($sTag);
+	        $this->add($sTag);
     }
     /**
      * t_comment
@@ -149,7 +228,7 @@ REGEX;
     {
 		if( $this->haveLinefeed($sTag) ){
 			$this->_IndentNextWhitespace = true;
-	        $this->oBeaut->add($sTag);
+	        $this->add($sTag);
 		}
 		else
 			$this->filterIndentation($sTag);
@@ -177,6 +256,6 @@ REGEX;
      */
 	function t_open_tag($sTag){
 		$this->_IndentNextWhitespace = true;
-		$this->oBeaut->add($sTag);
+		$this->add($sTag);
 	}
 }

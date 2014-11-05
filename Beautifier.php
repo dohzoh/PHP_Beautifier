@@ -170,7 +170,7 @@ class PHP_Beautifier implements PHP_Beautifier_Interface
      * Type of newline
      * @var string
      */
-    public $sNewLine = PHP_EOL;
+    public $sNewLine = "\n";
     /**
      * Type of whitespace to use for indent
      * @var string
@@ -242,7 +242,7 @@ class PHP_Beautifier implements PHP_Beautifier_Interface
     /** Mark the begin of the end of a DoWhile sequence **/
     private $doWhileBeginEnd;
     // Methods
-    
+    public $isBatch = false;
     /**
      * Constructor.
      * Assing values to {@link $aControlStructures},{@link $aControlStructuresEnd},
