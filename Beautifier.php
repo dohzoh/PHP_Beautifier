@@ -716,23 +716,14 @@ class PHP_Beautifier implements PHP_Beautifier_Interface
      */
     public function setInputFile($sFile) 
     {
-        $bCli = (php_sapi_name() == 'cli');
+        $bCli = (php_sapi_name() === 'cli');
         if (strpos($sFile, '://') === false and !file_exists($sFile) and !($bCli and $sFile == STDIN)) {
             throw new Exception("File '$sFile' doesn't exists");
         }
         $this->sText = '';
         $this->sInputFile = $sFile;
-        $fp = ($bCli and $sFile == STDIN) ? STDIN : fopen($sFile, 'r');
-        do {
-            $data = fread($fp, 8192);
-            if (strlen($data) == 0) {
-                break;
-            }
-            $this->sText.= $data;
-        } while (true);
-        if (!($bCli and $fp == STDIN)) {
-            fclose($fp);
-        }
+        $sFile = ($bCli and $sFile === STDIN) ? "php://stdin" : $sFile;
+        $this->sText = file_get_contents($sFile);
         return true;
     }
 
