@@ -340,5 +340,13 @@ REGEX;
 		else
 	        return false;
 	}
+    /**
+     * remofe linefeed code (CRLF,CR,LF)
+     * @param string $sTag
+     * @return string
+     */
+    protected function removeLinefeed($sTag){
+        return strtr($sTag, array_fill_keys(array("\r\n", "\r", "\n"), ""));
+    }
 }
 

@@ -56,6 +56,7 @@ SCRIPT;
         $this->oBeaut->setInputString($sTextOriginal);
         $this->oBeaut->process();
         $sTextActual = $this->oBeaut->get();
+        $this->assertEquals(bin2hex($sTextExpected), bin2hex($sTextActual));
         $this->assertEquals($sTextExpected, $sTextActual);
 
     }

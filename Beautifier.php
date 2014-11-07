@@ -1531,7 +1531,18 @@ class PHP_Beautifier implements PHP_Beautifier_Interface
      * @access private
      * @return mixed array or false
      */
-    private function getPreviousToken($iPrev = 1) 
+    public function getRawPrevToken($offset = 1){
+        return $this->getRawToken($offset * -1);
+    }
+    public function getRawToken($offset){
+        if($token = $this->getToken($this->iCount+$offset))
+        {
+            return $token;
+        }
+        else
+            return false;
+    }
+    private function getPreviousToken($iPrev = 1)
     {
         for ($x = $this->iCount-1 ; $x >= 0 ; $x--) {
             $aToken = &$this->getToken($x);
@@ -1552,7 +1563,10 @@ class PHP_Beautifier implements PHP_Beautifier_Interface
      * @access private
      * @return array
      */
-    private function getNextToken($iNext = 1) 
+    public function getRawNextToken($offset = 1){
+        return $this->getRawToken($offset);
+    }
+    private function getNextToken($iNext = 1)
     {
         for ($x = $this->iCount+1 ; $x < (count($this->aTokens) -1) ; $x++) {
             $aToken = &$this->getToken($x);
