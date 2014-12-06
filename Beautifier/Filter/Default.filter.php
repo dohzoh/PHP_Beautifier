@@ -48,16 +48,16 @@
  */
 final class PHP_Beautifier_Filter_Default extends PHP_Beautifier_Filter
 {
-	const FILTER_INDENT = "indent";
-	const FILTER_LINEFEED = "linefeed";
+    const FILTER_INDENT = "indent";
+    const FILTER_LINEFEED = "linefeed";
     const FILTER_BRACENEWLINE = "newlinebc";
 
-	// default settings
+    // default settings
     protected $aSettings = array(
-		self::FILTER_INDENT => "true",
-		self::FILTER_LINEFEED    => "LF", // LF, CR, CRLF, PHPEOL, false
+        self::FILTER_INDENT => "true",
+        self::FILTER_LINEFEED    => "LF", // LF, CR, CRLF, PHPEOL, false
         self::FILTER_BRACENEWLINE => "false",
-	);
+    );
 
     protected $sDescription = 'Default Filter for PHP_Beautifier';
     /**
@@ -68,7 +68,7 @@ final class PHP_Beautifier_Filter_Default extends PHP_Beautifier_Filter
      * <code>
      * parent::__construct($oBeaut, $aSettings)
      * </code>
-     * 
+     *
      * @param PHP_Beautifier $oBeaut    PHP_Beautifier Object
      * @param array          $aSettings Settings for the PHP_Beautifier
      *
@@ -77,49 +77,51 @@ final class PHP_Beautifier_Filter_Default extends PHP_Beautifier_Filter
      */
     public function __construct(PHP_Beautifier $oBeaut, $aSettings = array())
     {
-		parent::__construct($oBeaut, $aSettings);
-		$this->_init();
+        parent::__construct($oBeaut, $aSettings);
+        $this->_init();
     }
-	private function _init(){
-		$this->_initLineFeed();	// linefeed setting
-	}
-	/**
-	 * initialize of line feed setting
-	 */
-	private function _initLineFeed(){
-		// line feed setting
-		if($this->oBeaut->isBatch){
-			$linefeed = $this->getSetting(self::FILTER_LINEFEED);
-
-			$replace = "\n";
-			switch($linefeed){
-				case "CRLF":
-					$replace = "\r\n";
-					break;
-				case "CR":
-					$replace = "\r";
-					break;
-				case "PHPEOL":
-					$replace = PHP_EOL;
-					break;
-				case "LF":
-				default:
-					break;
-			}
-			$this->oBeaut->setNewLine($replace);
-		}
-	}
-	
+    private function _init()
+    {
+        $this->_initLineFeed();    // linefeed setting
+    }
     /**
-     * __call 
-     * 
+     * initialize of line feed setting
+     */
+    private function _initLineFeed()
+    {
+     // line feed setting
+        if ($this->oBeaut->isBatch) {
+            $linefeed = $this->getSetting(self::FILTER_LINEFEED);
+
+            $replace = "\n";
+            switch($linefeed){
+                case "CRLF":
+                    $replace = "\r\n";
+                    break;
+                case "CR":
+                    $replace = "\r";
+                    break;
+                case "PHPEOL":
+                    $replace = PHP_EOL;
+                    break;
+                case "LF":
+                default:
+                    break;
+            }
+            $this->oBeaut->setNewLine($replace);
+        }
+    }
+
+    /**
+     * __call
+     *
      * @param mixed $sMethod Method name
      * @param mixed $aArgs   Method arguments
      *
      * @access protected
      * @return voidadd_header=apache
      */
-    function __call($sMethod, $aArgs) 
+    public function __call($sMethod, $aArgs)
     {
         if (!is_array($aArgs) or count($aArgs) != 1) {
             throw (new Exception('Call to Filter::__call with wrong argument'));
@@ -129,103 +131,110 @@ final class PHP_Beautifier_Filter_Default extends PHP_Beautifier_Filter
     }
     // Bypass the function!
     /**
-     * off 
+     * off
      *
      * @access public
      * @return void
      */
-    public function off() 
+    public function off()
     {
     }
-	
+
     /**
      * Indent count
      */
-	public function getIndent(){
-		if($this->_indentCount === 0)
-			return "";
+    public function getIndent()
+    {
+        if ($this->_indentCount === 0) {
+            return "";
+        }
         $indentChar = $this->oBeaut->getIndentChar();
         $indentNumber = $this->oBeaut->getIndentNumber();
         $indent = str_repeat($indentChar, $indentNumber);
         $indent = str_repeat($indent, $this->_indentCount);
-		return $indent;
-	}
-	protected $_indentCount = 0;
-    protected function indentIncrease(){
-		$this->_indentCount++;
-	}
-	protected function indentDecrease(){
-		$this->_indentCount--;
-		if($this->_indentCount < 1)
-			$this->_indentCount = 0;
-	}
+        return $indent;
+    }
+    protected $_indentCount = 0;
+    protected function indentIncrease()
+    {
+        $this->_indentCount++;
+    }
+    protected function indentDecrease()
+    {
+        $this->_indentCount--;
+        if ($this->_indentCount < 1) {
+            $this->_indentCount = 0;
+        }
+    }
 
-	/**
-	 * PHP_Beautify::add
-	 * @param string $sTag
-	 */
-	public function add($sTag){
-		$this->oBeaut->add( $this->filterLinefeed($sTag));
-	}
+    /**
+     * PHP_Beautify::add
+     * @param string $sTag
+     */
+    public function add($sTag)
+    {
+        $this->oBeaut->add($this->filterLinefeed($sTag));
+    }
 
-	/**
-	 * indentation filter
-	 * @param type $sTag
-	 */
+    /**
+     * indentation filter
+     * @param type $sTag
+     */
     public function filterIndentation($sTag)
     {
         $indentChar = $this->oBeaut->getIndentChar();
         $indentNumber = $this->oBeaut->getIndentNumber();
-        if($indentChar!=="\t"){  // space indent
+        if ($indentChar!=="\t") {
+// space indent
             $regexChar = "\t";
             $regexNumber = "1";
-        }
-        else{   // tab indent
+        } else {
+// tab indent
             $regexChar = " ";
             $regexNumber = "4";
         }
-
         $regex = <<<REGEX
 ![{$regexChar}]{{$regexNumber}}!i
 REGEX;
         $replace = str_repeat($indentChar, $indentNumber);
-		$replace = preg_replace($regex, $replace, $sTag);
+        $replace = preg_replace($regex, $replace, $sTag);
 
-        if($this->getSetting(self::FILTER_INDENT)!=="false")
+        if ($this->getSetting(self::FILTER_INDENT)!=="false") {
             return $replace;
-        else
+        } else {
             return $sTag;
+        }
     }
-	
-	/**
-	 * linefeed filter
-	 * @param string $sTag
-	 */
-	public function filterLinefeed($sTag){
-		if(($linefeed = $this->getSetting(self::FILTER_LINEFEED))!=="false"){
-			$replace = $this->oBeaut->getNewLine();
-			$sTag = strtr($sTag, array_fill_keys(array("\r\n", "\r", "\n"), $replace));
-//			$sTag = preg_replace($regex, $replace,$sTag);
-		}
-		return $sTag;
-	}
+
+    /**
+     * linefeed filter
+     * @param string $sTag
+     */
+    public function filterLinefeed($sTag)
+    {
+        if (($linefeed = $this->getSetting(self::FILTER_LINEFEED))!=="false") {
+            $replace = $this->oBeaut->getNewLine();
+            $sTag = strtr($sTag, array_fill_keys(array("\r\n", "\r", "\n"), $replace));
+      //			$sTag = preg_replace($regex, $replace,$sTag);
+        }
+        return $sTag;
+    }
 
     /**
      * new line before open brace
      * @param string $sTag
      */
-    public function filterBraceNewLine($sTag){
+    public function filterBraceNewLine($sTag)
+    {
 //        Log::singleton('console')->info(__METHOD__."(".bin2hex($sTag)."):".var_export($sTag,true));
 //            Log::singleton('console')->info("getRawPrevToken".var_export($this->oBeaut->getRawPrevToken(),true));
 //            Log::singleton('console')->info("getRawNextToken".var_export($this->oBeaut->getRawNextToken(),true));
-        if($this->getSetting(self::FILTER_BRACENEWLINE)!=="false")
-        {
+        if ($this->getSetting(self::FILTER_BRACENEWLINE)!=="false") {
             $sTag = $this->oBeaut->getNewLine().$this->getIndent().$sTag;
 //        Log::singleton('console')->info(__METHOD__."(".bin2hex($sTag)."):".var_export($sTag,true));
         }
         return $sTag;
     }
-
     /**
      * t_whitespace
      *
@@ -236,18 +245,17 @@ REGEX;
      */
     // // comment[LF]
     // [SPACE][SPACE][SPACE][SPACE]
-	private $_IndentNextWhitespace = false;
+    private $_IndentNextWhitespace = false;
     private $_lastIndentation = "";
-    function t_whitespace($sTag)
+    public function t_whitespace($sTag)
     {
-		if( $this->haveLinefeed($sTag) )
+        if ($this->haveLinefeed($sTag)) {
             $sTag = $this->filterIndentation($sTag);
-		elseif( $this->_IndentNextWhitespace ){
-			$this->_IndentNextWhitespace = false;
+        } elseif ($this->_IndentNextWhitespace) {
+            $this->_IndentNextWhitespace = false;
             $sTag = $this->filterIndentation($sTag);
-		}
-		else{
-//            $sTag = $this->filterBraceNewLine($sTag);
+        } else {
+              //            $sTag = $this->filterBraceNewLine($sTag);
         }
         $this->add($sTag);
     }
@@ -259,40 +267,41 @@ REGEX;
      * @access public
      * @return void
      */
-    function t_comment($sTag)
+    public function t_comment($sTag)
     {
-		if( $this->haveLinefeed($sTag) ){
-			$this->_IndentNextWhitespace = true;
-	        $this->add($sTag);
-		}
-		else
+        if ($this->haveLinefeed($sTag)) {
+            $this->_IndentNextWhitespace = true;
+               $this->add($sTag);
+        } else {
             $this->add($this->filterIndentation($sTag));
+        }
     }
     /**
-     * t_doc_comment 
+     * t_doc_comment
      *
      * @param mixed $sTag The tag to be processed
      *
      * @access public
      * @return void
      */
-    function t_doc_comment($sTag) 
+    public function t_doc_comment($sTag)
     {
         $this->add($this->filterIndentation($sTag));
-	}
+    }
 
     /**
-     * t_open_tag 
-     * 
+     * t_open_tag
+     *
      * @param mixed $sTag The tag to be processed
      *
      * @access public
      * @return void
      */
-	function t_open_tag($sTag){
-		$this->_IndentNextWhitespace = true;
-		$this->add($sTag);
-	}
+    public function t_open_tag($sTag)
+    {
+        $this->_IndentNextWhitespace = true;
+        $this->add($sTag);
+    }
 
     /**
      * t_open_brace t_close_brace
@@ -302,28 +311,34 @@ REGEX;
      * @access public
      * @return void
      */
-    function t_open_brace($sTag)
+    public function t_open_brace($sTag)
     {
 //		Log::singleton('console')->info(__METHOD__.var_export($sTag,true));
-		$prevToken = $this->oBeaut->getRawPrevToken();
-		if(! is_array($prevToken) || $prevToken[0] !== T_WHITESPACE){
-//            Log::singleton('console')->info("prev not whitespace".var_export( $prevToken,true));
-			$sTag = $this->filterBraceNewLine($sTag);
-		}
-		// previous token is white space
-		else{
-			if(! $this->haveLinefeed( $prevToken[1] ) ){
-//                Log::singleton('console')->info("prev whitespace not have line feed".var_export( $prevToken,true));
-				$sTag = $this->filterBraceNewLine($sTag);
-			}
-		}
-			
+        $prevToken = $this->oBeaut->getRawPrevToken();
+        if (! is_array($prevToken) || $prevToken[0] !== T_WHITESPACE) {
+      //            Log::singleton('console')->info("prev not whitespace".var_export( $prevToken,true));
+            switch($prevToken[0]){
+                case T_OBJECT_OPERATOR:
+                    break;
+
+                default:
+                    $sTag = $this->filterBraceNewLine($sTag);
+                    break;
+            }
+        } // previous token is white space
+        else {
+            if (! $this->haveLinefeed($prevToken[1])) {
+         //                Log::singleton('console')->info("prev whitespace not have line feed".var_export( $prevToken,true));
+                $sTag = $this->filterBraceNewLine($sTag);
+            }
+        }
+
         $this->add($sTag);
-		$this->indentIncrease();
+        $this->indentIncrease();
     }
-    function t_close_brace($sTag)
+    public function t_close_brace($sTag)
     {
-		$this->add($sTag);
-		$this->indentDecrease();
-	}
+        $this->add($sTag);
+        $this->indentDecrease();
+    }
 }
