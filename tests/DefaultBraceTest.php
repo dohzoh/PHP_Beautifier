@@ -137,4 +137,29 @@ SCRIPT;
         $this->assertEquals($sTextExpected, $sTextActual);
     }
 
+
+    /**
+     *  test add new line before open brace
+     */
+    public function testAfterDoller(){
+        $sTextOriginal = <<<SCRIPT
+<?php
+\$abc->\${abc};
+?>
+SCRIPT;
+        $sTextExpected = <<<SCRIPT
+<?php
+\$abc->\${abc};
+?>
+SCRIPT;
+
+        $this->oBeaut->setInputString($sTextOriginal);
+        $this->oBeaut->setNewLine("\n");
+        $this->oBeaut->addFilter("Default", ["newlinebc"=>true]);
+        $this->oBeaut->process();
+        $sTextActual = $this->oBeaut->get();
+
+        $this->assertEquals($sTextExpected, $sTextActual);
+    }
+
 }
