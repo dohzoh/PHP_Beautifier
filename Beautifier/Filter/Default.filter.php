@@ -313,10 +313,20 @@ REGEX;
      */
     public function t_open_brace($sTag)
     {
-//		Log::singleton('console')->info(__METHOD__.var_export($sTag,true));
+//	Log::singleton('console')->info(__METHOD__.var_export($sTag,true));
         $prevToken = $this->oBeaut->getRawPrevToken();
-        if (! is_array($prevToken) || $prevToken[0] !== T_WHITESPACE) {
-      //            Log::singleton('console')->info("prev not whitespace".var_export( $prevToken,true));
+
+//  Log::singleton('console')->info("prev not whitespace".var_export( $prevToken,true));
+        if (! is_array($prevToken)) {
+            switch($prevToken){
+                case "\$":
+                    break;
+
+                default:
+                    $sTag = $this->filterBraceNewLine($sTag);
+                    break;
+            }
+        } elseif ($prevToken[0] !== T_WHITESPACE) {
             switch($prevToken[0]){
                 case T_OBJECT_OPERATOR:
                     break;
@@ -328,7 +338,7 @@ REGEX;
         } // previous token is white space
         else {
             if (! $this->haveLinefeed($prevToken[1])) {
-         //                Log::singleton('console')->info("prev whitespace not have line feed".var_export( $prevToken,true));
+//  Log::singleton('console')->info("prev whitespace not have line feed".var_export( $prevToken,true));
                 $sTag = $this->filterBraceNewLine($sTag);
             }
         }
